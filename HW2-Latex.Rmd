@@ -84,8 +84,6 @@ $$
 
 \text{We can find } \mathbb{E}(Z^2\mathbb{1}_{\mid Z\mid\geq\gamma}) \text{ first.}\\
 
-\mathbb{E}(Z^2\mathbb{1}_{\mid Z\mid\geq\gamma}) &= 1-\int^{\gamma}_{-\gamma} z^2f(z)dz \\
-&=1-\int^\gamma_{-\gamma} z^2\frac{1}{\sqrt{2\pi}\tau} e^{-\frac{(z-\omega)^2}{2\tau^2}} dz\\
 
 
 
