@@ -1,0 +1,128 @@
+---
+title: "HW2-task1&2a"
+author: "Yaze Gao"
+date: "1/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+# Part a
+$$
+\begin{aligned} 
+
+
+Z \sim N(\omega, \tau^2)  \text{ where} \ Z \in[-\gamma,\gamma]  \\
+
+\mathbb{E}[Z\mathbb{1}_{\begin{equation} \mid Z \mid \leq \gamma\end{equation}}] &= \int^\gamma_{-\gamma} z f(z)  d z \\
+
+&= \int^\gamma_{-\gamma} (z -\omega) \frac{1}{\sqrt{2\pi}\tau} e^{-\frac{(z-\omega)^2}{2\tau^2}} dz +\omega\int^\gamma_{-\gamma}\frac{1}{\sqrt{2\pi}\tau}e^{-\frac{(z-\omega)^2}{2\tau^2}}dz \\
+
+&=\frac{\tau}{\sqrt{2\pi}}(e^{-\frac{(\gamma+\omega)^2}{2\tau^2}}-e^{-\frac{(\gamma-\omega)^2}{2\tau^2}})+\omega[\Phi(\frac{\gamma-\omega}{\tau})-\Phi(\frac{-\gamma-\omega}{\tau})]\\
+
+\text{QED}
+
+\end{aligned}
+
+$$
+
+
+
+# Part b
+
+$$
+\begin{aligned}
+\mathbb{E}[(X-\hat\mu^{H}_{n})] &= \mathbb{E}[(X-\overline{X}_n\mathbb{1}_{ \mid \overline{X}_n \mid \geq \alpha})^2] \\
+&=\mathbb{E}[(X-\overline{X}_n+\overline{X}_n-\overline{X}_n \mathbb{1}_{\mid \overline{X}_n\mid\geq\alpha})^2] \\
+&= \mathbb{E}[(X-\overline{X}_n)^2]+2\mathbb{E}[(X-\overline{X}_n)(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})]+\mathbb{E}[(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})^2] \\
+
+\text{Where } \mathbb{E}[\overline{X}_n]=\mathbb{E}[X] &= \mu \\ \mathbb{E}[X^2] &= \sigma^2 +\mu \\ Var(\overline{X}_n) &=
+\frac{\sigma^2}{n} \\ \mathbb{E}[\overline{X}_n^2] &= \mu^2 +\frac{\sigma^2}{n} \\
+\text{Thus, } \\
+\mathbb{E}[(X-\overline{X}_n)^2] &= \mathbb{E}[X^2-2X\overline{X}_n+\overline{X}_n^2] \\
+&=\sigma^2+\mu-2\mu^2+\mu^2+\frac{\sigma^2}{n} \\ 
+&=\sigma^2+\frac{\sigma^2}{n} \\
+
+
+\text{Appling the fact }\mathbb{E}(Z\mathbb{1}_{\mid Z \mid\geq\gamma}) = \mathbb{E}(Z)-\mathbb{E}(Z\mathbb{1}_{\mid Z\mid\leq\gamma})\text{ in our equation.}\\
+\\
+
+2\mathbb{E}[(X-\overline{X}_n)(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})] &= 2\mathbb{E}[X(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n \mid\geq\alpha})-\overline{X}_n(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n \mid\geq\alpha})]\\
+
+&= 2[\mu\mathbb{E}(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid\geq\alpha})-\mathbb{E}(\overline{X}_n^2)+\mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid\geq\alpha})] \\
+
+\text{Appling the equation mentioned above }\Rightarrow &=2[\mu\mathbb{E}(\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid\leq\alpha})-\frac{\sigma^2}{n}-\mu^2+\mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid\geq\alpha})] \\
+\\
+
+\text{By utilizing the result from part a, we can see that }\\
+
+\mathbb{E}(\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid\leq\alpha}) 
+&= \frac{\sigma}{\sqrt{2\pi n}}(e^{-\frac{n(\alpha+\mu)^2}{2\sigma^2}}-e^{-\frac{n(\alpha-\mu)^2}{2\sigma^2}})
++\mu(\Phi(\frac{\sqrt{n}(\alpha-\mu)}{\sigma})-\Phi(\frac{\sqrt{n}(-\alpha-\mu)}{\sigma}))\\\\
+
+\text{Thus, }\\
+
+2\mathbb{E}[(X-\overline{X}_n)(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})] &= 
+2[\mu(\frac{\sigma}{\sqrt{2\pi n}}(e^{-\frac{n(\alpha+\mu)^2}{2\sigma^2}}-e^{-\frac{n(\alpha-\mu)^2}{2\sigma^2}})
++\mu(\Phi(\frac{\sqrt{n}(\alpha-\mu)}{\sigma})-\Phi(\frac{\sqrt{n}(-\alpha-\mu)}{\sigma})))-\frac{\sigma^2}{n}-\mu^2+\mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid\geq\alpha})]\\
+
+
+\mathbb{E}[(\overline{X}_n-\overline{X}_n\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})^2] &= \mathbb{E}[\overline{X}_n^2-2\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha}+\overline{X}_n^2\mathbb{1}^2_{\mid \overline{X}_n\mid \geq\alpha}]\\
+
+&= \mathbb{E}(\overline{X}_n^2) - \mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha}) \\
+&= \mu^2+\frac{\sigma^2}{n}-\mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha})
+
+
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\text{Then we can find } \mathbb{E}(\overline{X}_n^2\mathbb{1}_{\mid \overline{X}_n\mid \geq\alpha}) \text{by using the method in part a.}\\
+
+\text{We can find } \mathbb{E}(Z^2\mathbb{1}_{\mid Z\mid\geq\gamma}) \text{ first.}\\
+
+\mathbb{E}(Z^2\mathbb{1}_{\mid Z\mid\geq\gamma}) &= 1-\int^{\gamma}_{-\gamma} z^2f(z)dz \\
+&=1-\int^\gamma_{-\gamma} z^2\frac{1}{\sqrt{2\pi}\tau} e^{-\frac{(z-\omega)^2}{2\tau^2}} dz\\
+
+
+
+
+
+
+\end{aligned}
+$$
+
+## Task 2
+# Part a
+
+$$
+
+\begin{aligned}
+
+Var(Y) &= Var(X^{\top}\beta^* + \epsilon) \\
+
+&= Var(X^{\top}\beta^*) +Var(\epsilon) \\
+&= \beta^{*^{\top}}\Sigma(\rho)\beta^*+\sigma^2 \\
+
+P(Y-X^{\top}\beta^*) &=  P(\epsilon)^2 \\
+&= \sigma^2 \\
+
+1-\frac{\sigma^2}{\beta^{*^{\top}}\Sigma(\rho)\beta^*+\sigma^2} &= \gamma \\
+1-\gamma &= \frac{\sigma^2}{\beta^{*^{\top}}\Sigma(\rho)\beta^*+\sigma^2} \\
+
+\Rightarrow 
+
+\sigma^2 &= \frac{\beta^{*^{\top}}\Sigma(\rho)\beta^*}{\gamma}-\beta^{*^{\top}}\Sigma(\rho)\beta^* \\
+&=\frac{1-\gamma}{\gamma}\beta^{*^{\top}}\Sigma(\rho)\beta^* \\
+
+QED
+
+\end{aligned}
+
+
+
+$$
