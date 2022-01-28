@@ -1,6 +1,5 @@
 ---
 title: "HW2-task1&2a"
-author: "Yaze Gao"
 date: "1/28/2022"
 output: html_document
 ---
