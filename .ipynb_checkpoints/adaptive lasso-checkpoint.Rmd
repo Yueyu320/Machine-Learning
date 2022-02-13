@@ -1,0 +1,112 @@
+---
+title: '561'
+author: "Shuo Wang"
+date: "1/27/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(HDeconometrics)
+library(mvtnorm)
+library(glmnet)
+```
+
+```{r, echo = FALSE}
+# generate data
+get_data = function(n, p, rho, signal){
+  SIGMA= c()
+  for(i in 1:p){
+    for(j in 1:p){
+      SIGMA = c(SIGMA, rho^abs(i-j))
+    }
+  }
+  SIGMA = matrix(SIGMA, nrow = p)
+  X = rmvnorm(n, mean = rep(0, p), sigma = SIGMA)
+  J = 1:p
+  if(signal == "sparse")
+    beta = 2 / sqrt(n) * as.numeric(J <= sqrt(p))
+  if(signal == "dense")
+    beta = 5 / (J*sqrt(n))
+  R2 = 0.8
+  sigma2 = ((1-R2)/R2 * t(beta) %*% SIGMA %*% beta)
+  epsilon = rnorm(n, 0, sqrt(sigma2))
+  y = X %*% beta + epsilon
+  return(cbind(data.frame(y = y), data.frame(X)))
+}
+```
+
+```{r}
+# calculate MSE for a particular model
+cal_MSE = function(n, p, rho, signal){
+  MSE_AIC = c()
+  MSE_BIC = c()
+  MSE_LOOCV = c()
+  for(i in 1:1000){
+    data = get_data(n, p, rho, signal)
+    # AIC
+    stage1 = ic.glmnet(data[,-1], data[,"y"], crit = "aic")
+    penalty.factor = 1 / abs(coef(stage1)[-1] + 1/sqrt(nrow(data)))
+    Adap_lasso_aic = ic.glmnet(data[,-1], data[,"y"], crit = "aic",
+                               penalty.factor = penalty.factor)
+    MSE_AIC = c(MSE_AIC, mean((Adap_lasso_aic$residuals)^2))
+    # BIC
+    stage1 = ic.glmnet(data[,-1], data[,"y"], crit = "bic")
+    penalty.factor = 1 / abs(coef(stage1)[-1] + 1/sqrt(nrow(data)))
+    Adap_lasso_bic = ic.glmnet(data[,-1], data[,"y"], crit = "bic", 
+                               penalty.factor = penalty.factor)
+    MSE_BIC = c(MSE_BIC, mean((Adap_lasso_bic$residuals)^2))
+    # LOOCV
+    stage1 = cv.glmnet(as.matrix(data[,-1]), unlist(data[,"y"]), type.measure = "mse", 
+                       nfold = n, alpha = 1, grouped = FALSE)
+    penalty.factor = 1 / abs(coef(stage1, s = stage1$lambda.min)[-1] + 1/sqrt(nrow(data)))
+    Adap_lasso_loocv = cv.glmnet(as.matrix(data[,-1]), unlist(data[,"y"]), 
+                                 type.measure = "mse", nfold = n, alpha = 1, 
+                                 penalty.factor = penalty.factor,
+                                 keep = TRUE, grouped = FALSE)
+    pred = predict(Adap_lasso_loocv, newx = as.matrix(data[,-1]), 
+                   s = Adap_lasso_loocv$lambda.min)
+    MSE_LOOCV = c(MSE_LOOCV, mean((unlist(data[,"y"])-pred)^2))
+  }
+  return(data.frame(AIC.MSE = mean(MSE_AIC), BIC.MSE = mean(MSE_BIC),
+                    LOOCV.MSE = mean(MSE_LOOCV)))
+}
+```
+
+```{r, warning=FALSE, eval = FALSE}
+set.seed(1)
+
+n = 100
+P = c(10, 25, 50)
+RHO = c(0, 0.25, 0.5)
+result = data.frame(p = NA, rho = NA, Estimator = "Adaptive_Lasso", 
+                    Signal = NA, AIC.MSE = NA, BIC.MSE = NA, LOOCV.MSE = NA)
+# sparse
+for(p in P){
+  for(rho in RHO){
+    temp = cal_MSE(n, p, rho, "sparse")
+    result = rbind(result, cbind(data.frame(p = p, rho = rho, Estimator = "Adaptive_Lasso", 
+                                      Signal = "Sparse"), temp))
+  }
+}
+# dense
+for(p in P){
+  for(rho in RHO){
+    temp = cal_MSE(n, p, rho, "dense")
+    result = rbind(result, cbind(data.frame(p = p, rho = rho, Estimator = "Adaptive_Lasso", 
+                                      Signal = "Dense"), temp))
+  }
+}
+saveRDS(result, "result_adaptive_lasso.Rda")
+```
+
+```{r, echo = FALSE}
+result = readRDS("result_adaptive_lasso.Rda")
+result = na.omit(result)
+rownames(result) = 1:18
+```
+
+```{r}
+result
+```
+
